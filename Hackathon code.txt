@@ -1,0 +1,221 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX 20
+
+char* my_strcasestr(const char* haystack, const char* needle) {
+    if (!*needle) return (char*) haystack;
+    for (; *haystack; haystack++) {
+        const char *h = haystack, *n = needle;
+        while (*h && *n && tolower(*h) == tolower(*n)) {
+            h++;
+            n++;
+        }
+        if (!*n) return (char*) haystack;
+    }
+    return NULL;
+}
+
+struct Plant {
+    char name[50];
+    char botanicalName[100];
+    char commonNames[100];
+    char habitat[100];
+    char uses[3][100];
+    char cultivation[200];
+    int bookmarked;
+};
+
+int main() {
+    struct Plant garden[MAX] = {
+        {
+            "Tulsi",
+            "Ocimum sanctum",
+            "Holy Basil, Tulsi",
+            "Tropical and sub-tropical regions",
+            { "Boosts immunity", "Helps with respiratory issues", "Reduces stress" },
+            "Grows in warm climate, requires sunlight and regular watering.",
+            0
+        },
+        {
+            "Neem",
+            "Azadirachta indica",
+            "Neem Tree",
+            "Indian subcontinent",
+            { "Antibacterial properties", "Used for skin disorders", "Improves oral health" },
+            "Thrives in hot climate, needs minimal water.",
+            0
+        },
+        {
+            "Aloe Vera",
+            "Aloe barbadensis miller",
+            "Ghritkumari",
+            "Dry regions with warm climate",
+            { "Cures burns", "Improves skin texture", "Aids digestion" },
+            "Needs little water, grows well in pots or sandy soil.",
+            0
+        },
+        {
+            "Ashwagandha",
+            "Withania somnifera",
+            "Indian ginseng",
+            "Drier regions of India",
+            { "Reduces stress", "Improves energy", "Enhances memory" },
+            "Prefers full sun, well-drained soil.",
+            0
+        },
+        {
+            "Turmeric",
+            "Curcuma longa",
+            "Haldi",
+            "Tropical climates",
+            { "Anti-inflammatory", "Boosts immunity", "Improves skin health" },
+            "Requires warm, moist soil and partial sunlight.",
+            0
+        }
+    };
+
+    int numPlants = 5;
+    int choice;
+    char search[100];
+
+    while (1) {
+        printf("\n==== Virtual Herbal Garden ====\n");
+        printf("1. View All Plants\n");
+        printf("2. View Plant Details\n");
+        printf("3. Search by Name (Show Full Details)\n");
+        printf("4. Add New Plant\n");
+        printf("5. Bookmark a Plant\n");
+        printf("6. View Bookmarked Plants\n");
+        printf("7. Delete a Plant\n");
+        printf("8. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar(); // clear newline
+
+        if (choice == 1) {
+            printf("\n-- List of Plants --\n");
+            for (int i = 0; i < numPlants; i++) {
+                printf("%d. %s\n", i + 1, garden[i].name);
+            }
+
+        } else if (choice == 2) {
+            printf("Enter plant number (1-%d): ", numPlants);
+            int i;
+            scanf("%d", &i); getchar();
+            if (i >= 1 && i <= numPlants) {
+                i--;
+                printf("\nName: %s\n", garden[i].name);
+                printf("Botanical Name: %s\n", garden[i].botanicalName);
+                printf("Common Names: %s\n", garden[i].commonNames);
+                printf("Habitat: %s\n", garden[i].habitat);
+                printf("Uses:\n  - %s\n  - %s\n  - %s\n", garden[i].uses[0], garden[i].uses[1], garden[i].uses[2]);
+                printf("Cultivation: %s\n", garden[i].cultivation);
+                printf("Bookmarked: %s\n", garden[i].bookmarked ? "Yes" : "No");
+            } else {
+                printf("Invalid selection.\n");
+            }
+
+        } else if (choice == 3) {
+            printf("Enter name to search: ");
+            fgets(search, sizeof(search), stdin);
+            search[strcspn(search, "\n")] = '\0';
+            int found = 0;
+            for (int i = 0; i < numPlants; i++) {
+                if (my_strcasestr(garden[i].name, search)) {
+                    printf("\n-- Found Plant --\n");
+                    printf("Name: %s\n", garden[i].name);
+                    printf("Botanical Name: %s\n", garden[i].botanicalName);
+                    printf("Common Names: %s\n", garden[i].commonNames);
+                    printf("Habitat: %s\n", garden[i].habitat);
+                    printf("Uses:\n  - %s\n  - %s\n  - %s\n", garden[i].uses[0], garden[i].uses[1], garden[i].uses[2]);
+                    printf("Cultivation: %s\n", garden[i].cultivation);
+                    printf("Bookmarked: %s\n", garden[i].bookmarked ? "Yes" : "No");
+                    found = 1;
+                }
+            }
+            if (!found) printf("No matching plant found.\n");
+
+        } else if (choice == 4) {
+            if (numPlants >= MAX) {
+                printf("Garden is full!\n");
+            } else {
+                printf("Enter Plant Name: ");
+                fgets(garden[numPlants].name, 50, stdin);
+                garden[numPlants].name[strcspn(garden[numPlants].name, "\n")] = '\0';
+
+                printf("Enter Botanical Name: ");
+                fgets(garden[numPlants].botanicalName, 100, stdin);
+                garden[numPlants].botanicalName[strcspn(garden[numPlants].botanicalName, "\n")] = '\0';
+
+                printf("Enter Common Names: ");
+                fgets(garden[numPlants].commonNames, 100, stdin);
+                garden[numPlants].commonNames[strcspn(garden[numPlants].commonNames, "\n")] = '\0';
+
+                printf("Enter Habitat: ");
+                fgets(garden[numPlants].habitat, 100, stdin);
+                garden[numPlants].habitat[strcspn(garden[numPlants].habitat, "\n")] = '\0';
+
+                for (int j = 0; j < 3; j++) {
+                    printf("Enter Use %d: ", j + 1);
+                    fgets(garden[numPlants].uses[j], 100, stdin);
+                    garden[numPlants].uses[j][strcspn(garden[numPlants].uses[j], "\n")] = '\0';
+                }
+
+                printf("Enter Cultivation Details: ");
+                fgets(garden[numPlants].cultivation, 200, stdin);
+                garden[numPlants].cultivation[strcspn(garden[numPlants].cultivation, "\n")] = '\0';
+
+                garden[numPlants].bookmarked = 0;
+
+                numPlants++;
+                printf("Plant added successfully!\n");
+            }
+
+        } else if (choice == 5) {
+            printf("Enter plant number to bookmark (1-%d): ", numPlants);
+            int i;
+            scanf("%d", &i); getchar();
+            if (i >= 1 && i <= numPlants) {
+                garden[i - 1].bookmarked = 1;
+                printf("Bookmarked: %s\n", garden[i - 1].name);
+            } else {
+                printf("Invalid number.\n");
+            }
+
+        } else if (choice == 6) {
+            printf("\n-- Bookmarked Plants --\n");
+            int found = 0;
+            for (int i = 0; i < numPlants; i++) {
+                if (garden[i].bookmarked) {
+                    printf("- %s\n", garden[i].name);
+                    found = 1;
+                }
+            }
+            if (!found) printf("No plants bookmarked yet.\n");
+
+        } else if (choice == 7) {
+            printf("Enter plant number to delete (1-%d): ", numPlants);
+            int i;
+            scanf("%d", &i); getchar();
+            if (i >= 1 && i <= numPlants) {
+                for (int j = i - 1; j < numPlants - 1; j++) {
+                    garden[j] = garden[j + 1];
+                }
+                numPlants--;
+                printf("Plant deleted.\n");
+            } else {
+                printf("Invalid number.\n");
+            }
+
+        } else if (choice == 8) {
+            printf("Exiting... 🌿\n");
+            break;
+        } else {
+            printf("Invalid choice. Try again.\n");
+        }
+    }
+
+    return 0;
+}
